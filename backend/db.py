@@ -8,19 +8,21 @@ async def get_all_faces():
     return await Face.prisma().find_many(include={"user": True})
 
 
-async def add_face(name: str, image_array) -> Face:
-    face_encoding = detect.get_face_encoding(image_array).tolist()
-    user = await User.prisma().create(
-        data={
-            "name": name,
-        }
-    )
-    face = await Face.prisma().create(
-        {"encoding": face_encoding, "user": {"connect": {"id": user.id}}},
-        include={"user": True},
-    )
+async def add_face_in_db(name: str, image_array) -> Face:
+    user_det = await detect.check_face_in_db(image_array)
+    if not isinstance(user_det, str):
+        user = await User.prisma().create(
+            data={
+                "name": name,
+            }
+        )
+        await Face.prisma().create(
+            {"encoding": user_det.tolist(), "user": {"connect": {"id": user.id}}},
+            include={"user": True},
+        )
 
-    return face
+        return user
+    return user_det
 
 
 if __name__ == "__main__":

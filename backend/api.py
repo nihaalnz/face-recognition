@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
-from db import get_all_faces, add_face
+from db import get_all_faces, add_face_in_db
 from detect import get_face_encoding, check_face_in_db, decode_image_to_array
 from pydantic import BaseModel
 
@@ -48,19 +48,22 @@ async def get_faces():
 
 
 @app.post("/add-face")
-async def _add_face(body: AddFaceBody):
+async def add_face(body: AddFaceBody):
     error = ""
     try:
         image_encoding = decode_image_to_array(body.image_encoding)
-        face = await add_face(body.name, image_encoding)
-        return face
+        face = await add_face_in_db(body.name, image_encoding)
+        if isinstance(face, str):
+            error = "Face already exists in the database"
+        else:
+            return face
     except IndexError:
         error = "No faces found, show face and try again"
 
     except ValueError:
         error = "More than one face found, remove additional faces"
 
-    return {"error": error}
+    return HTTPException(status_code=500, detail=error)
 
 
 @app.get("/face-encoding")
@@ -81,7 +84,7 @@ async def _get_face_enconding(image: ImageData):
 
 
 @app.get("/check-face")
-async def _check_face(image: ImageData):
+async def check_face(image: ImageData):
     error = ""
     try:
         image_array = decode_image_to_array(image.image_encoding)
@@ -92,5 +95,4 @@ async def _check_face(image: ImageData):
         error = "No faces found, show face and try again"
     except ValueError:
         error = "More than one face found, remove additional faces"
-    print(error)
-    return {"error": error}
+    return HTTPException(status_code=500, detail=error)

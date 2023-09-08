@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>{% block title %}{% endblock title %}</title>
+        <link
+            rel="stylesheet"
+            href="{{url_for('static',filename='dist/css/output.css')}}"
+        />
+        {% block head %}{% endblock head %}
+    </head>
+
+    <body>
+        {% block content %}
+        {% endblock content %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+        <script src="{{ url_for('static', filename='src/main.js') }}"></script>
+    </body>
+</html>

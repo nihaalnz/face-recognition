@@ -1,8 +1,7 @@
 from dotenv import load_dotenv
-
 load_dotenv()
 
-from flask import Flask, render_template, Response, jsonify, send_from_directory
+from flask import Flask, render_template, Response, request
 import cv2, base64, requests, os, threading
 
 BASE_API_URL = os.getenv("BASE_API_URL")
@@ -15,16 +14,14 @@ camera = cv2.VideoCapture(
 )
 camera_lock = threading.Lock()
 
-
-@app.route("/node_modules/<path:filename>")
-def serve_node_module(filename):
-    return send_from_directory("node_modules", filename)
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
 
 def generate():
     while True:
@@ -58,12 +55,19 @@ def video_feed():
 
 
 @app.route("/_check_face", methods=["GET"])
-def _check_face():
+def check_face():
     image_base64 = capture_frame()
     return requests.get(
         f"{BASE_API_URL}/check-face", json={"image_encoding": image_base64}
     ).json()
 
+@app.route("/_register", methods=["POST"])
+def add_face():
+    data = request.json
+    image_base64 = capture_frame()
+    return requests.post(
+        f"{BASE_API_URL}/add-face", json={"image_encoding": image_base64, "name": data["name"]}
+    ).json()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
