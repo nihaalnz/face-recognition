@@ -3,22 +3,25 @@ from prisma import Prisma
 from prisma.models import User, Face
 import detect
 
+
 async def get_all_faces():
     return await Face.prisma().find_many(include={"user": True})
 
 
-async def add_face(name: str) -> User:
-    face_encoding = detect.get_face_encoding().tolist()
+async def add_face(name: str, image_array) -> Face:
+    face_encoding = detect.get_face_encoding(image_array).tolist()
     user = await User.prisma().create(
         data={
             "name": name,
         }
     )
     face = await Face.prisma().create(
-        {"encoding": face_encoding, "user": {"connect": {"id": user.id}}}, include={"user": True}
+        {"encoding": face_encoding, "user": {"connect": {"id": user.id}}},
+        include={"user": True},
     )
 
     return face
+
 
 if __name__ == "__main__":
 
@@ -34,5 +37,5 @@ if __name__ == "__main__":
 
         # face = verify_face([1, 5, 3.1, 4.5])
         # print(face)
-    
+
     asyncio.run(main())

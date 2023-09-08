@@ -11,7 +11,9 @@ generator client {
 model User {
     id   Int    @id @default(autoincrement())
     name String
+    busId Int?
     Face Face[]
+    Bus Bus? @relation(fields: [busId], references: [id])
     // Other attributes for user
 }
 
@@ -20,4 +22,12 @@ model Face {
     userId   Int
     user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     encoding Float[]
+}
+
+model Bus {
+    id   Int    @id @default(autoincrement())
+    name String
+    model String
+    maxPassengers Int
+    passengers User[]
 }
