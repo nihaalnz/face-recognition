@@ -64,7 +64,7 @@ async def add_face(body: AddFaceBody):
     try:
         image_encoding = decode_image_to_array(body.image_encoding)
         face = await add_face_in_db(body.name, image_encoding)
-        if isinstance(face, str):
+        if isinstance(face, int):
             error = "Face already exists in the database"
         else:
             return face

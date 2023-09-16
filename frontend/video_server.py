@@ -80,7 +80,3 @@ def add_face():
 def get_capacity():
     bus_id = os.getenv("BUS_ID")
     return requests.get(f"{BASE_API_URL}/capacity", json={"bus_id": bus_id}).json()
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)

@@ -15,7 +15,7 @@ async def get_capacity(bus_id: int) -> int:
     return 0
 
 
-async def add_face_in_db(name: str, image_array) -> Face:
+async def add_face_in_db(name: str, image_array) -> User | int:
     user_det = await detect.check_face_in_db(image_array)
     if not isinstance(user_det, int):
         user = await User.prisma().create(
