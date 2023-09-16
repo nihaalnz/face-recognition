@@ -1,12 +1,21 @@
-import asyncio
+from dotenv import load_dotenv
+load_dotenv()
+
+import asyncio, os
 from prisma import Prisma
-from prisma.models import User, Face
+from prisma.models import User, Face, Bus
 import detect
 
 
 async def get_all_faces():
     return await Face.prisma().find_many(include={"user": True})
 
+async def get_capacity():
+    bus_id = os.getenv("BUS_NUMBER")
+    bus = await Bus.prisma().find_unique(where={"id": 3}, include={"passengers": True})
+    if bus:
+        return bus.maxPassengers - len(bus.passengers)
+    return 0
 
 async def add_face_in_db(name: str, image_array) -> Face:
     user_det = await detect.check_face_in_db(image_array)
@@ -24,6 +33,29 @@ async def add_face_in_db(name: str, image_array) -> Face:
         return user
     return user_det
 
+async def check_passenger_in_bus(passenger_id: int):
+    bus_id = os.getenv("BUS_NUMBER")
+    print(bus_id)
+    bus = await Bus.prisma().find_unique(where={"id": 3}, include={"passengers": True})
+    if bus:
+        for passenger in bus.passengers:
+            if passenger.id == passenger_id:
+                return True
+    return False
+
+async def add_passenger_in_bus(passenger_id: int):
+    bus_id = os.getenv("BUS_NUMBER")
+    bus = await Bus.prisma().find_unique(where={"id": 3}, include={"passengers": True})
+    if bus:
+        user = await User.prisma().update(where={"id": passenger_id}, data={"busId": bus.id}, include={"Bus": {"include": {"passengers": True}}})
+        return user
+
+async def remove_passenger_from_bus(passenger_id: int):
+    bus_id = os.getenv("BUS_NUMBER")
+    bus = await Bus.prisma().find_unique(where={"id": 3}, include={"passengers": True})
+    if bus:
+        user = await User.prisma().update(where={"id": passenger_id}, data={"busId": None}, include={"Bus": {"include": {"passengers": True}}})
+        return user
 
 if __name__ == "__main__":
 

@@ -69,5 +69,11 @@ def add_face():
         f"{BASE_API_URL}/add-face", json={"image_encoding": image_base64, "name": data["name"]}
     ).json()
 
+@app.route("/_capacity", methods=["GET"])
+def get_capacity():
+    return requests.get(
+        f"{BASE_API_URL}/capacity"
+    ).json()
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

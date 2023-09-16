@@ -2,6 +2,28 @@ const captureButton = document.getElementById("captureButton");
 const registerButton = document.getElementById("registerButton");
 const registerForm = document.getElementById("registerForm");
 const spinner = document.getElementById("spinnerToggle");
+const capacity = document.getElementById("capacity");
+
+function reloadCapacity() {
+    fetch("/_capacity")
+    .then(function (response) {
+        // The API call was successful!
+        return response.json();
+    })
+    .then(function (data) {
+        console.log(data);
+        capacity.innerHTML = `Capacity: ${data["capacity"]}`;
+    })
+    .catch(function (err) {
+        // There was an error
+        console.warn("Something went wrong.", err);
+    }); 
+}
+
+window.onload = function () {
+    console.log("loaded")
+    reloadCapacity();
+}
 
 captureButton?.addEventListener("click", function () {
     spinner.click()
@@ -27,9 +49,10 @@ captureButton?.addEventListener("click", function () {
             }
 
             spinner.click();
-
-            modalText.innerHTML = `${data["name"]} has successfully checked in!`;
+            modalHeader.innerHTML = "Success!";
+            modalText.innerHTML = `<strong>${data["name"]}</strong> has successfully <strong>${data["status"]}</strong>!`;
             modalToggle.click();
+            reloadCapacity();
         })
         .catch(function (err) {
             // There was an error            
@@ -73,8 +96,10 @@ registerForm?.addEventListener("submit", function (e) {
                 modalToggle.click();
                 return;
             }
-
-            modalText.innerHTML = `${data["name"]} has successfully registered!`;
+            
+            spinner.click(); // Hide spinner
+            modalHeader.innerHTML = "Success!";
+            modalText.innerHTML = `${data["name"]} has <strong>successfully registered</strong>!`;
             modalToggle.click();
         })
         .catch(function (err) {

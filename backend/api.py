@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
-from db import get_all_faces, add_face_in_db
+from db import get_all_faces, add_face_in_db, check_passenger_in_bus, add_passenger_in_bus, remove_passenger_from_bus, get_capacity
 from detect import get_face_encoding, check_face_in_db, decode_image_to_array
 from pydantic import BaseModel
 
@@ -88,11 +88,29 @@ async def check_face(image: ImageData):
     error = ""
     try:
         image_array = decode_image_to_array(image.image_encoding)
-        name = await check_face_in_db(image_array)
-        print({"name": name} if name else {"name": None})
-        return {"name": name} if name else {"name": None}
+        id = await check_face_in_db(image_array)
+        if isinstance(id, int):
+            passenger_in_bus = await check_passenger_in_bus(id)
+            if passenger_in_bus:
+                user = await remove_passenger_from_bus(id)
+                status = "checked out"
+            else:
+                capacity = await get_capacity()
+                if capacity == 0:
+                    raise ValueError("Bus has reached its <strong>maximum capacity</strong>")
+
+                user = await add_passenger_in_bus(id)
+                status = "checked in"
+            return {"name": user.name, "status": status}
+        else:
+            error = "Face <strong>not found in database</strong>, <strong>add face</strong> first"
     except IndexError:
         error = "No faces found, show face and try again"
-    except ValueError:
-        error = "More than one face found, remove additional faces"
+    except ValueError as e:
+        error = e.__str__()
     return HTTPException(status_code=500, detail=error)
+
+@app.get("/capacity")
+async def _get_capacity():
+    capacity = await get_capacity()
+    return {"capacity": capacity}

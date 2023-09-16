@@ -30,7 +30,7 @@ async def check_face_in_db(image_array) -> str | None:
 
         results = face_recognition.compare_faces([encoding], unknown_encoding)
         if results[0]:
-            return face.user.name
+            return face.user.id
     return unknown_encoding
 
 def decode_image_to_array(decoded_image: str):
