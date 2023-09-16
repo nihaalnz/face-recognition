@@ -6,6 +6,7 @@
     "flowbite": "^1.8.1"
   },
   "scripts": {
-    "watch": "tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watch"
+    "watch": "tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watch",
+    "build": "tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css"
   }
 }

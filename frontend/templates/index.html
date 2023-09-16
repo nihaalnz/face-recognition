@@ -4,8 +4,8 @@
 {% block content %}
 <section class="bg-white dark:bg-gray-900">
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center">
-        <h1 class="text-6xl font-bold">Scan Face</h1>
-        <img class="mx-auto my-3" src="{{ url_for('video_feed') }}" />
+        <h1 class="text-6xl font-bold dark:text-white">Scan Face</h1>
+        <img class="mx-auto my-5 rounded-3xl" src="{{ url_for('video_feed') }}" />
         <button
             id="captureButton"
             type="button"
@@ -13,7 +13,7 @@
         >
             Proceed
         </button>
-        <h1 id="capacity" class="text-4xl font-bold">Capacity: </h1>
+        <h1 id="capacity" class="text-4xl font-bold dark:text-white">Capacity: </h1>
     </div>
 </section>
 

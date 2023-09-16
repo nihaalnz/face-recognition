@@ -14,6 +14,7 @@ camera = cv2.VideoCapture(
 )
 camera_lock = threading.Lock()
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -22,6 +23,7 @@ def index():
 @app.route("/register")
 def register():
     return render_template("register.html")
+
 
 def generate():
     while True:
@@ -57,23 +59,28 @@ def video_feed():
 @app.route("/_check_face", methods=["GET"])
 def check_face():
     image_base64 = capture_frame()
+    bus_id = os.getenv("BUS_ID")
     return requests.get(
-        f"{BASE_API_URL}/check-face", json={"image_encoding": image_base64}
+        f"{BASE_API_URL}/check-face",
+        json={"image_encoding": image_base64, "bus_id": bus_id},
     ).json()
+
 
 @app.route("/_register", methods=["POST"])
 def add_face():
     data = request.json
     image_base64 = capture_frame()
     return requests.post(
-        f"{BASE_API_URL}/add-face", json={"image_encoding": image_base64, "name": data["name"]}
+        f"{BASE_API_URL}/add-face",
+        json={"image_encoding": image_base64, "name": data["name"]},
     ).json()
+
 
 @app.route("/_capacity", methods=["GET"])
 def get_capacity():
-    return requests.get(
-        f"{BASE_API_URL}/capacity"
-    ).json()
+    bus_id = os.getenv("BUS_ID")
+    return requests.get(f"{BASE_API_URL}/capacity", json={"bus_id": bus_id}).json()
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
