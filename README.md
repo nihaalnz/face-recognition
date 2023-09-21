@@ -46,7 +46,7 @@ Before running the application, make sure you have the following prerequisites i
         ```
 5. Install the required packages:
 
-    5.1 Install the required python packages:
+    5.1 Install the required python packages ([Requires C++ Build Tools and CMake](https://github.com/ageitgey/face_recognition/issues/175#issue-257710508)):
     ```bash
     pip install -r requirements.txt
     ```
