@@ -28,6 +28,7 @@ def register():
 def generate():
     while True:
         success, frame = camera.read()
+        frame = cv2.flip(frame, 1)
         if not success:
             break
         ret, jpeg = cv2.imencode(".jpg", frame)
